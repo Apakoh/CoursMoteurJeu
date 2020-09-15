@@ -1,7 +1,7 @@
 #include "TP1.h"
 #include <iostream>
-#include "../libraries/lodepng/lodepng.h"
-#include "../libraries/glm/glm.hpp"
+#include <sfml/graphics.hpp>
+#include <glm/glm.hpp>
 
 int foo()
 {
