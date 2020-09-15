@@ -1,29 +1,46 @@
-#include "TP1.h"
+#include "TP1.hpp"
 #include <iostream>
-#include <glm/glm.hpp>
+#include <glm/gtx/intersect.hpp>
 #include <sfml/graphics.hpp>
 #include <sfml/graphics/image.hpp>
 
-int foo()
-{
-        glm::vec4 Position = glm::vec4(glm::vec3(0.0), 1.0);
-        glm::mat4 Model = glm::mat4(1.0);
-        Model[4] = glm::vec4(1.0, 1.0, 0.0, 1.0);
-        glm::vec4 Transformed = Model * Position;
-        return 0;
-}
-
 int main()
 {
-  CreateImage();
-  return 0;
-}
+  unsigned int height = 800;
+  unsigned int width = 800;
+  Ray r;
+  glm::vec3 out;
 
-void CreateImage()
-{
-  sf::RenderWindow window(sf::VideoMode(800, 800), "Main Window");
-    sf::CircleShape shape(300.f);
-    shape.setFillColor(sf::Color::Green);
+  Sphere s;
+  s.center = glm::vec3(width/2, height/2, 0);
+  s.radius = 100.0;
+  sf::RenderWindow window(sf::VideoMode(width, height), "Main Window");
+
+  sf::Image img;
+  img.create(width, height);
+
+  for(int x = 0; x < width; x++)
+  {
+    for(int y = 0; y < height; y++)
+    {
+      r.origin = glm::vec3(x, y, 0);
+      r.direction = glm::vec3(0,0,1);
+      if(glm::intersectRaySphere(r.origin, r.direction, s.center, s.radius, out, out))
+      {
+        img.setPixel(x, y, sf::Color(255,255,255));
+      }
+      else
+      {
+        img.setPixel(x, y, sf::Color(0,0,0));
+      }
+    }
+  }
+
+  sf::Texture texture;
+  texture.loadFromImage(img);
+
+  sf::Sprite sprite;
+  sprite.setTexture(texture);
 
     while (window.isOpen())
     {
@@ -33,54 +50,9 @@ void CreateImage()
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-
         window.clear();
-        window.draw(shape);
+        window.draw(sprite);
         window.display();
     }
-}
-
-void IntersectionRayonSphere()
-{
-  /*vpc = c - p  // this is the vector from p to c
-
-if ((vpc . d) < 0) // when the sphere is behind the origin p
-                    // note that this case may be dismissed if it is
-                    // considered that p is outside the sphere
-        if (|vpc| > r)
-
-                   // there is no intersection
-
-	else if (|vpc| == r)
-
-		intersection = p
-
-	else // occurs when p is inside the sphere
-
-		pc = projection of c on the line
-                // distance from pc to i1
-		dist = sqrt(radius^2 - |pc - c|^2)
-		di1 = dist - |pc - p|
-		intersection = p + d * di1
-
-else // center of sphere projects on the ray
-
-	pc = projection of c on the line
-	if (| c - pc | > r)
-
-		// there is no intersection
-
-	else
-                // distance from pc to i1
-		dist = sqrt(radius^2 - |pc - c|^2)
-
-      		if (|vpc| > r) // origin is outside sphere
-
-			di1 = |pc - p| - dist
-
-		else // origin is inside sphere
-
-			di1 = |pc - p| + dist
-
-		intersection = p + d * di1*/
+  return 0;
 }
