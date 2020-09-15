@@ -1,0 +1,3 @@
+Atom :
+  - C++ Compiler : gpp-compiler
+  - https://osdn.net/projects/mingw/releases/ (In order to make the compiler to work)
