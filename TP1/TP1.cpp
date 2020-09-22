@@ -24,7 +24,6 @@ int main()
 
   glm::vec3 sphere_color = glm::vec3(255, 255, 255);
 
-  sf::RenderWindow window(sf::VideoMode(width, height), "Main Window");
 
   sf::Image img;
   img.create(width, height);
@@ -80,6 +79,18 @@ int main()
   // V
   // y
 
+  CreateWindow(img);
+
+  return 0;
+}
+
+void CreateWindow(sf::Image img)
+{
+  unsigned int height = 800;
+  unsigned int width = 800;
+
+  sf::RenderWindow window(sf::VideoMode(width, height), "Main Window");
+
   sf::Texture texture;
   texture.loadFromImage(img);
 
@@ -98,5 +109,4 @@ int main()
         window.draw(sprite);
         window.display();
     }
-  return 0;
 }
