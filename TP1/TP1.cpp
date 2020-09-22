@@ -18,14 +18,26 @@ int main()
 
   Ray r;
 
-  Sphere s;
-  s.center = glm::vec3(c.width/2, c.height/2, 0);
-  s.radius = 100.0;
-  s.color = glm::vec3(255, 255, 255);
+  Sphere s1;
+  s1.center = glm::vec3(c.width/2, c.height/2, 0);
+  s1.radius = 200.0;
+  s1.color = glm::vec3(255, 255, 255);
+
+  Sphere s2;
+  s2.center = glm::vec3(0, 0, 0);
+  s2.radius = 200.0;
+  s2.color = glm::vec3(255, 255, 255);
+
+  Sphere s3;
+  s3.center = glm::vec3(c.width, c.height, 0);
+  s3.radius = 200.0;
+  s3.color = glm::vec3(255, 255, 255);
+
+  Sphere spheres[3] = {s1, s2, s3};
 
   //Light
   Light l;
-  l.position = glm::vec3(100, 100, 400);
+  l.position = glm::vec3(c.width/2, c.height/2, 600);
   l.l_e = glm::vec3(1000, 0, 1000);
 
   Scene sc;
@@ -44,7 +56,8 @@ int main()
       px.x = x;
       px.y = y;
 
-      IntersectObject(s, l, px, c.img);
+      //IntersectObject(s1, l, px, c.img);
+      IntersectObjects(spheres, l, px, c.img);
     }
   }
 
@@ -66,11 +79,16 @@ void SetPixelCamera(sf::Image& img, int x, int y, glm::vec3 c)
   img.setPixel(x, y, sf::Color(c.x, c.y, c.z));
 }
 
-void IntersectObjects(Sphere *spheres, Ray r, Light l, int x, int y, sf::Image& img)
+void RayCastCamera(Sphere *spheres, Light l, Pixel px, sf::Image& img)
 {
-  for(int i = 0; i < sizeof(spheres); i++)
+  IntersectObjects(spheres, l, px, img);
+}
+
+void IntersectObjects(Sphere *spheres, Light l, Pixel px, sf::Image& img)
+{
+  for(int i = 0; i < sizeof(spheres) - 1; i++)
   {
-    //IntersectObject(spheres[i], r, l, x, y, img);
+    IntersectObject(spheres[i], l, px, img);
   }
 }
 
@@ -100,18 +118,13 @@ void IntersectObject(Sphere s, Light l, Pixel px, sf::Image& img)
     }
     else
     {
-      SetPixelCamera(img, px.x, px.y, s.color);
+      //SetPixelCamera(img, px.x, px.y, s.color);
     }
-  }
-  else
-  {
-    SetPixelCamera(img, px.x, px.y, glm::vec3(0,0,0));
   }
 }
 
 void CreateWindow(Camera c)
 {
-
   sf::RenderWindow window(sf::VideoMode(c.width, c.height), "Main Window");
 
   sf::Texture texture;
