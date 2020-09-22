@@ -31,7 +31,7 @@ int main()
   Sphere s3;
   s3.center = glm::vec3(c.width, c.height, 0);
   s3.radius = 200.0;
-  s3.color = glm::vec3(0, 0, 0);
+  s3.color = glm::vec3(0, 177, 100);
 
   Sphere spheres[3] = {s1, s2, s3};
 
@@ -132,7 +132,7 @@ bool IntersectObject(Sphere s, Light l, Pixel px, glm::vec3& intersect, glm::vec
       float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction),glm::normalize(lamp_direction)));
 
       // Final Fantasy Calcul : A Real Reborn XII
-      color = glm::clamp(l.l_e, glm::vec3(0, 0, 0), glm::vec3(255, 255, 255)) * lamp_to_intersect * (cos_theta / (float)M_PI);
+      color = glm::clamp(l.l_e * s.color, glm::vec3(0, 0, 0), glm::vec3(255, 255, 255)) * lamp_to_intersect * (cos_theta / (float)M_PI);
       intersect = intersection_position;
 
       return true;
