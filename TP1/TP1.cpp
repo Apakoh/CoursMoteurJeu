@@ -28,6 +28,10 @@ int main()
   l.position = glm::vec3(100, 100, 400);
   l.l_e = glm::vec3(1000, 0, 1000);
 
+  Scene sc;
+  sc.camera = c;
+  sc.light = l;
+
   for(int x = 0; x < c.width; x++)
   {
     for(int y = 0; y < c.height; y++)
@@ -35,7 +39,12 @@ int main()
       r.origin = glm::vec3(x, y, 0);
       r.direction = glm::vec3(0,0,1);
 
-      IntersectObject(s, r, l, x, y, c.img);
+      Pixel px;
+      px.r = r;
+      px.x = x;
+      px.y = y;
+
+      IntersectObject(s, l, px, c.img);
     }
   }
 
@@ -61,16 +70,16 @@ void IntersectObjects(Sphere *spheres, Ray r, Light l, int x, int y, sf::Image& 
 {
   for(int i = 0; i < sizeof(spheres); i++)
   {
-    IntersectObject(spheres[i], r, l, x, y, img);
+    //IntersectObject(spheres[i], r, l, x, y, img);
   }
 }
 
-void IntersectObject(Sphere s, Ray r, Light l, int x, int y, sf::Image& img)
+void IntersectObject(Sphere s, Light l, Pixel px, sf::Image& img)
 {
   glm::vec3 intersection_position;
   glm::vec3 intersection_normal;
 
-  if(glm::intersectRaySphere(r.origin, r.direction, s.center, s.radius, intersection_position, intersection_normal))
+  if(glm::intersectRaySphere(px.r.origin, px.r.direction, s.center, s.radius, intersection_position, intersection_normal))
   {
     glm::vec3 lamp_direction = l.position - intersection_position;
     if(!glm::intersectRaySphere(intersection_position, lamp_direction, s.center, s.radius, intersection_position, intersection_normal))
@@ -78,29 +87,25 @@ void IntersectObject(Sphere s, Ray r, Light l, int x, int y, sf::Image& img)
       // Calcul of D
       float distance_carre = lamp_direction.x * lamp_direction.x  + lamp_direction.y * lamp_direction.y  + lamp_direction.z * lamp_direction.z;
 
-      // Calcul for color
-      glm::vec3 l_e_and_object_color = (l.l_e * s.color);
-      l_e_and_object_color = glm::vec3(l_e_and_object_color.x/255, l_e_and_object_color.y/255, l_e_and_object_color.z/255);
-
       glm::vec3 lamp_to_intersect = glm::normalize(lamp_direction) * glm::normalize(lamp_direction);
 
       // Calcul for cos theta
-      float cos_theta = glm::abs(glm::dot(glm::normalize(r.direction),glm::normalize(lamp_direction)));
+      float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction),glm::normalize(lamp_direction)));
 
       // Final Fantasy Calcul : A Real Reborn XII
       glm::vec3 color_temp = l.l_e * lamp_to_intersect * (cos_theta / (float)M_PI);
       sf::Color color = sf::Color(color_temp.x, color_temp.y, color_temp.z);
 
-      SetPixelCamera(img, x, y, color_temp);
+      SetPixelCamera(img, px.x, px.y, color_temp);
     }
     else
     {
-      img.setPixel(x, y, sf::Color(s.color.x, s.color.y, s.color.z));
+      SetPixelCamera(img, px.x, px.y, s.color);
     }
   }
   else
   {
-    img.setPixel(x, y, sf::Color(0,0,0));
+    SetPixelCamera(img, px.x, px.y, glm::vec3(0,0,0));
   }
 }
 

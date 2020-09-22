@@ -32,7 +32,22 @@ class Light
     glm::vec3 l_e;
 };
 
+class Pixel
+{
+  public:
+    Ray r;
+    int x;
+    int y;
+};
+
+class Scene
+{
+  public:
+    Camera camera;
+    Light light;
+};
+
 void CreateWindow(Camera c);
 void SetPixelCamera(sf::Image& img, int x, int y, glm::vec3 color);
-void IntersectObject(Sphere s, Ray r, Light l, int x, int y, sf::Image& img);
+void IntersectObject(Sphere s, Light l, Pixel px, sf::Image& img);
 void IntersectObjects(Sphere *spheres, Ray r, Light l, int x, int y, sf::Image& img);
