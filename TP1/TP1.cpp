@@ -24,8 +24,8 @@ int main()
   s1.color = glm::vec3(255, 255, 255);
 
   Sphere s2;
-  s2.center = glm::vec3(0, 0, -100);
-  s2.radius = 400.0;
+  s2.center = glm::vec3(c.width/2, c.width/3, 150);
+  s2.radius = 200.0;
   s2.color = glm::vec3(255, 0, 0);
 
   Sphere s3;
