@@ -28,9 +28,6 @@ int main()
   l.position = glm::vec3(100, 100, 400);
   l.l_e = glm::vec3(1000, 0, 1000);
 
-  glm::vec3 intersection_position;
-  glm::vec3 intersection_normal;
-
   for(int x = 0; x < c.width; x++)
   {
     for(int y = 0; y < c.height; y++)
@@ -60,11 +57,11 @@ void SetPixelCamera(sf::Image& img, int x, int y, glm::vec3 c)
   img.setPixel(x, y, sf::Color(c.x, c.y, c.z));
 }
 
-void IntersectObjects(glm::vec3 lamp, Sphere *spheres, Ray r)
+void IntersectObjects(Sphere *spheres, Ray r, Light l, int x, int y, sf::Image& img)
 {
   for(int i = 0; i < sizeof(spheres); i++)
   {
-
+    IntersectObject(spheres[i], r, l, x, y, img);
   }
 }
 

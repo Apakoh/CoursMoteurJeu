@@ -35,4 +35,4 @@ class Light
 void CreateWindow(Camera c);
 void SetPixelCamera(sf::Image& img, int x, int y, glm::vec3 color);
 void IntersectObject(Sphere s, Ray r, Light l, int x, int y, sf::Image& img);
-void IntersectObjects(glm::vec3 lamp, Sphere *spheres, Ray r);
+void IntersectObjects(Sphere *spheres, Ray r, Light l, int x, int y, sf::Image& img);
