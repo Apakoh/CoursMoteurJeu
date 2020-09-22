@@ -31,14 +31,14 @@ int main()
   Sphere s3;
   s3.center = glm::vec3(c.width, c.height, 0);
   s3.radius = 200.0;
-  s3.color = glm::vec3(0, 255, 255);
+  s3.color = glm::vec3(0, 0, 0);
 
   Sphere spheres[3] = {s1, s2, s3};
 
   //Light
   Light l;
   l.position = glm::vec3(c.width/2, c.height/2, 600);
-  l.l_e = glm::vec3(255, 255, 255);
+  l.l_e = glm::vec3(255, 0, 255);
 
   Scene sc;
   sc.camera = c;
@@ -106,7 +106,7 @@ void IntersectObjects(Sphere *spheres, Light l, Pixel px, sf::Image& img)
       }
     }
   }
-  
+
   SetPixelCamera(img, px.x, px.y, color_min);
 }
 
@@ -115,16 +115,18 @@ bool IntersectObject(Sphere s, Light l, Pixel px, glm::vec3& intersect, glm::vec
   glm::vec3 intersection_position;
   glm::vec3 intersection_normal;
 
+  // Pixel to Sphere
   if(glm::intersectRaySphere(px.r.origin, px.r.direction, s.center, s.radius, intersection_position, intersection_normal))
   {
     glm::vec3 lamp_direction = l.position - intersection_position;
 
+    // Sphere to Lamp
     if(!glm::intersectRaySphere(intersection_position, lamp_direction, s.center, s.radius, intersection_position, intersection_normal))
     {
       // Calcul of D
       float distance_carre = lamp_direction.x * lamp_direction.x  + lamp_direction.y * lamp_direction.y  + lamp_direction.z * lamp_direction.z;
 
-      glm::vec3 lamp_to_intersect = glm::normalize(lamp_direction) * glm::normalize(lamp_direction);
+      float lamp_to_intersect = glm::abs(glm::dot(glm::normalize(lamp_direction), glm::normalize(lamp_direction)));
 
       // Calcul for cos theta
       float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction),glm::normalize(lamp_direction)));
