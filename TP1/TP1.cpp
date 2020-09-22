@@ -20,7 +20,7 @@ int main()
 
   Sphere s1;
   s1.center = glm::vec3(c.width/2, c.height/2, 0);
-  s1.radius = 200.0;
+  s1.radius = 100.0;
   s1.color = glm::vec3(255, 255, 255);
 
   Sphere s2;
@@ -37,7 +37,7 @@ int main()
 
   //Light
   Light l;
-  l.position = glm::vec3(c.width/2, c.height/2, 600);
+  l.position = glm::vec3(c.width/2, c.height/2, 400);
   l.l_e = glm::vec3(1000, 0, 1000);
 
   Scene sc;
@@ -86,13 +86,30 @@ void RayCastCamera(Sphere *spheres, Light l, Pixel px, sf::Image& img)
 
 void IntersectObjects(Sphere *spheres, Light l, Pixel px, sf::Image& img)
 {
+  glm::vec3 color;
+  glm::vec3 intersection;
+
+  float t = 0;
+  float t_temp;
+
+  glm::vec3 color_min = glm::vec3(0,0,0);
+
   for(int i = 0; i < sizeof(spheres) - 1; i++)
   {
-    IntersectObject(spheres[i], l, px, img);
+    if(IntersectObject(spheres[i], l, px, intersection, color))
+    {
+      t_temp = glm::length((intersection - px.r.origin) * (glm::vec3(1,1,1)/px.r.direction));
+      if(t_temp < t && t > 0);
+      {
+          t = t_temp;
+          color_min = color;
+      }
+    }
   }
+  SetPixelCamera(img, px.x, px.y, color_min);
 }
 
-void IntersectObject(Sphere s, Light l, Pixel px, sf::Image& img)
+bool IntersectObject(Sphere s, Light l, Pixel px, glm::vec3& intersect, glm::vec3& color)
 {
   glm::vec3 intersection_position;
   glm::vec3 intersection_normal;
@@ -111,16 +128,12 @@ void IntersectObject(Sphere s, Light l, Pixel px, sf::Image& img)
       float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction),glm::normalize(lamp_direction)));
 
       // Final Fantasy Calcul : A Real Reborn XII
-      glm::vec3 color_temp = l.l_e * lamp_to_intersect * (cos_theta / (float)M_PI);
-      sf::Color color = sf::Color(color_temp.x, color_temp.y, color_temp.z);
-
-      SetPixelCamera(img, px.x, px.y, color_temp);
-    }
-    else
-    {
-      //SetPixelCamera(img, px.x, px.y, s.color);
+      color = l.l_e * lamp_to_intersect * (cos_theta / (float)M_PI);
+      intersect = intersection_position;
+      return true;
     }
   }
+  return false;
 }
 
 void CreateWindow(Camera c)
@@ -139,7 +152,9 @@ void CreateWindow(Camera c)
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
-                window.close();
+            {
+              window.close();
+            }
         }
         window.clear();
         window.draw(sprite);

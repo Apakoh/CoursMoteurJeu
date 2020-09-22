@@ -49,6 +49,6 @@ class Scene
 
 void CreateWindow(Camera c);
 void SetPixelCamera(sf::Image& img, int x, int y, glm::vec3 color);
-void IntersectObject(Sphere s, Light l, Pixel px, sf::Image& img);
+bool IntersectObject(Sphere s, Light l, Pixel px, glm::vec3& intersect, glm::vec3& color);
 void IntersectObjects(Sphere *spheres, Light l, Pixel px, sf::Image& img);
 void RayCastCamera(Sphere *spheres, Light l, Pixel px, sf::Image& img);
