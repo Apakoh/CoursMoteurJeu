@@ -19,26 +19,26 @@ int main()
   Ray r;
 
   Sphere s1;
-  s1.center = glm::vec3(c.width/2, c.height/2, 0);
-  s1.radius = 100.0;
+  s1.center = glm::vec3(c.width/2, c.width/2, 0);
+  s1.radius = 200.0;
   s1.color = glm::vec3(255, 255, 255);
 
   Sphere s2;
-  s2.center = glm::vec3(0, 0, 0);
-  s2.radius = 200.0;
-  s2.color = glm::vec3(255, 255, 255);
+  s2.center = glm::vec3(0, 0, -100);
+  s2.radius = 400.0;
+  s2.color = glm::vec3(255, 0, 0);
 
   Sphere s3;
   s3.center = glm::vec3(c.width, c.height, 0);
   s3.radius = 200.0;
-  s3.color = glm::vec3(255, 255, 255);
+  s3.color = glm::vec3(0, 255, 255);
 
   Sphere spheres[3] = {s1, s2, s3};
 
   //Light
   Light l;
-  l.position = glm::vec3(c.width/2, c.height/2, 400);
-  l.l_e = glm::vec3(1000, 0, 1000);
+  l.position = glm::vec3(c.width/2, c.height/2, 600);
+  l.l_e = glm::vec3(255, 255, 255);
 
   Scene sc;
   sc.camera = c;
@@ -106,6 +106,7 @@ void IntersectObjects(Sphere *spheres, Light l, Pixel px, sf::Image& img)
       }
     }
   }
+  
   SetPixelCamera(img, px.x, px.y, color_min);
 }
 
@@ -117,6 +118,7 @@ bool IntersectObject(Sphere s, Light l, Pixel px, glm::vec3& intersect, glm::vec
   if(glm::intersectRaySphere(px.r.origin, px.r.direction, s.center, s.radius, intersection_position, intersection_normal))
   {
     glm::vec3 lamp_direction = l.position - intersection_position;
+
     if(!glm::intersectRaySphere(intersection_position, lamp_direction, s.center, s.radius, intersection_position, intersection_normal))
     {
       // Calcul of D
@@ -128,8 +130,9 @@ bool IntersectObject(Sphere s, Light l, Pixel px, glm::vec3& intersect, glm::vec
       float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction),glm::normalize(lamp_direction)));
 
       // Final Fantasy Calcul : A Real Reborn XII
-      color = l.l_e * lamp_to_intersect * (cos_theta / (float)M_PI);
+      color = glm::clamp(l.l_e, glm::vec3(0, 0, 0), glm::vec3(255, 255, 255)) * lamp_to_intersect * (cos_theta / (float)M_PI);
       intersect = intersection_position;
+
       return true;
     }
   }
