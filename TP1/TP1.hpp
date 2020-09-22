@@ -7,6 +7,7 @@ class Sphere
   public:
     float radius;
     glm::vec3 center;
+    glm::vec3 color;
 };
 
 class Ray
@@ -17,3 +18,5 @@ class Ray
 };
 
 void CreateWindow(sf::Image img);
+void IntersectObject(Sphere s, Ray r, glm::vec3 lamp);
+void SetPixelCamera(sf::Image img, int x, int y, glm::vec3 color);
