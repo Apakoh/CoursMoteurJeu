@@ -5,6 +5,8 @@
 #include <sfml/graphics/image.hpp>
 #include <math.h>
 
+const int color_clamp = 10000;
+
 int main()
 {
   sf::Image img;
@@ -25,7 +27,7 @@ int main()
 
   Sphere s2;
   s2.center = glm::vec3(c.width/2, c.width/3, 150);
-  s2.radius = 200.0;
+  s2.radius = 400.0;
   s2.color = glm::vec3(255, 0, 0);
 
   Sphere s3;
@@ -98,7 +100,7 @@ void IntersectObjects(Sphere *spheres, Light l, Pixel px, sf::Image& img)
   {
     if(IntersectObject(spheres[i], l, px, intersection, color))
     {
-      t_temp = glm::length((intersection - px.r.origin) * (glm::vec3(1,1,1)/px.r.direction));
+      t_temp = glm::distance(intersection, px.r.origin);
       if(t_temp < t && t > 0);
       {
           t = t_temp;
@@ -126,13 +128,16 @@ bool IntersectObject(Sphere s, Light l, Pixel px, glm::vec3& intersect, glm::vec
       // Calcul of D
       float distance_carre = lamp_direction.x * lamp_direction.x  + lamp_direction.y * lamp_direction.y  + lamp_direction.z * lamp_direction.z;
 
+      // Normal of lamp_direction
+
+
       float lamp_to_intersect = glm::abs(glm::dot(glm::normalize(lamp_direction), glm::normalize(lamp_direction)));
 
       // Calcul for cos theta
-      float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction),glm::normalize(lamp_direction)));
+      float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction), glm::normalize(lamp_direction)));
 
       // Final Fantasy Calcul : A Real Reborn XII
-      color = glm::clamp(l.l_e * s.color, glm::vec3(0, 0, 0), glm::vec3(255, 255, 255)) * lamp_to_intersect * (cos_theta / (float)M_PI);
+      color = glm::clamp(l.l_e * s.color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp)) * lamp_to_intersect * (0.2f / (float)M_PI);
       intersect = intersection_position;
 
       return true;
