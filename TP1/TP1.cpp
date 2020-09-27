@@ -7,6 +7,9 @@
 
 const int color_clamp = 255;
 
+const int nb_spheres = 3;
+const int nb_lights = 1;
+
 int main()
 {
   sf::Image img;
@@ -38,14 +41,14 @@ int main()
   s3.color = glm::vec3(0, 177, 100);
   s3.albedo = glm::vec3(1, 1, 1);
 
-  Sphere spheres[3] = {s1, s2, s3};
+  Sphere spheres[nb_spheres] = {s1, s2, s3};
 
   //Light
   Light l1;
   l1.position = glm::vec3(c.width/2, c.height/2, -300);
   l1.l_e = glm::vec3(1000, 1000, 1000);
 
-  Light lights[1] = {l1};
+  Light lights[nb_lights] = {l1};
 
   Scene sc;
   sc.camera = c;
@@ -101,7 +104,7 @@ void IntersectObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
 
   glm::vec3 color_min = glm::vec3(0,0,0);
 
-  for(int i = 0; i < sizeof(spheres) - 1; i++)
+  for(int i = 0; i < nb_spheres; i++)
   {
     if(IntersectObject(spheres[i], l, px, intersection, color))
     {
@@ -122,12 +125,15 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
   glm::vec3 intersection_position;
   glm::vec3 intersection_normal;
 
+  bool path_to_light = false;
+
   intersect = glm::vec3(0,0,0);
 
   // Pixel to Sphere
   if(glm::intersectRaySphere(px.r.origin, px.r.direction, s.center, s.radius, intersection_position, intersection_normal))
   {
-    for(int i = 0; i < sizeof(l); i++)
+    //std::cout << sizeof(l) << std::endl;
+    for(int i = 0; i < nb_lights; i++)
     {
       glm::vec3 lamp_direction = l[i].position - intersection_position;
 
@@ -137,11 +143,11 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
         // Calculate color for
         LightOnFireTanana(s, l[i], px, color, intersection_position, lamp_direction);
         intersect = intersection_position;
-        return true;
+        path_to_light = true;
       }
     }
   }
-  return false;
+  return path_to_light;
 }
 
 // https://www.youtube.com/watch?v=aTBlKRzNf74
