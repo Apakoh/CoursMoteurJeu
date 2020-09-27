@@ -8,6 +8,7 @@ class Sphere
     float radius;
     glm::vec3 center;
     glm::vec3 color;
+    glm::vec3 albedo;
 };
 
 class Ray

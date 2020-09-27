@@ -5,7 +5,7 @@
 #include <sfml/graphics/image.hpp>
 #include <math.h>
 
-const int color_clamp = 10000;
+const int color_clamp = 255;
 
 int main()
 {
@@ -21,26 +21,29 @@ int main()
   Ray r;
 
   Sphere s1;
-  s1.center = glm::vec3(c.width/2, c.width/2, 0);
+  s1.center = glm::vec3(c.width/2, c.height/2, 500);
   s1.radius = 200.0;
   s1.color = glm::vec3(255, 255, 255);
+  s1.albedo = glm::vec3(1, 1, 1);
 
   Sphere s2;
-  s2.center = glm::vec3(c.width/2, c.width/3, 150);
-  s2.radius = 400.0;
+  s2.center = glm::vec3(c.width/2, c.height/2, 300);
+  s2.radius = 100.0;
   s2.color = glm::vec3(255, 0, 0);
+  s2.albedo = glm::vec3(1, 1, 1);
 
   Sphere s3;
   s3.center = glm::vec3(c.width, c.height, 0);
   s3.radius = 200.0;
   s3.color = glm::vec3(0, 177, 100);
+  s3.albedo = glm::vec3(1, 1, 1);
 
   Sphere spheres[3] = {s1, s2, s3};
 
   //Light
   Light l;
-  l.position = glm::vec3(c.width/2, c.height/2, 600);
-  l.l_e = glm::vec3(255, 0, 255);
+  l.position = glm::vec3(c.width/2, c.height/2, -300);
+  l.l_e = glm::vec3(1000, 1000, 1000);
 
   Scene sc;
   sc.camera = c;
@@ -129,15 +132,18 @@ bool IntersectObject(Sphere s, Light l, Pixel px, glm::vec3& intersect, glm::vec
       float distance_carre = lamp_direction.x * lamp_direction.x  + lamp_direction.y * lamp_direction.y  + lamp_direction.z * lamp_direction.z;
 
       // Normal of lamp_direction
-
-
-      float lamp_to_intersect = glm::abs(glm::dot(glm::normalize(lamp_direction), glm::normalize(lamp_direction)));
+      float lamp_to_intersect = glm::abs(glm::dot(glm::normalize(intersection_position - s.center), glm::normalize(lamp_direction)));
 
       // Calcul for cos theta
       float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction), glm::normalize(lamp_direction)));
 
+      // Albedo
+      glm::vec3 albedo = glm::normalize(s.albedo * s.color);
+
       // Final Fantasy Calcul : A Real Reborn XII
-      color = glm::clamp(l.l_e * s.color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp)) * lamp_to_intersect * (0.2f / (float)M_PI);
+      color = l.l_e * lamp_to_intersect * (albedo / (float)M_PI);
+      color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
+
       intersect = intersection_position;
 
       return true;
@@ -145,6 +151,33 @@ bool IntersectObject(Sphere s, Light l, Pixel px, glm::vec3& intersect, glm::vec
   }
   return false;
 }
+
+// https://www.youtube.com/watch?v=aTBlKRzNf74
+/* bool LightOnFireTanana(Sphere s, Light l, Pixel px, glm::vec3& color, glm::vec3 intersection_position, glm::vec3 lamp_direction)
+{
+  if(!glm::intersectRaySphere(intersection_position, lamp_direction, s.center, s.radius, intersection_position, intersection_normal))
+  {
+    // Calcul of D
+    float distance_carre = lamp_direction.x * lamp_direction.x  + lamp_direction.y * lamp_direction.y  + lamp_direction.z * lamp_direction.z;
+
+    // Normal of lamp_direction
+    float lamp_to_intersect = glm::abs(glm::dot(glm::normalize(intersection_position - s.center), glm::normalize(lamp_direction)));
+
+    // Calcul for cos theta
+    float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction), glm::normalize(lamp_direction)));
+
+    // Albedo
+    glm::vec3 albedo = glm::normalize(s.albedo * s.color);
+
+    // Final Fantasy Calcul : A Real Reborn XII
+    color = l.l_e * lamp_to_intersect * (albedo / (float)M_PI);
+    color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
+
+    return true;
+  }
+
+  return false;
+} */
 
 void CreateWindow(Camera c)
 {
