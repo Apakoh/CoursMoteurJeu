@@ -50,6 +50,7 @@ class Scene
 
 void CreateWindow(Camera c);
 void SetPixelCamera(sf::Image& img, int x, int y, glm::vec3 color);
-bool IntersectObject(Sphere s, Light l, Pixel px, glm::vec3& intersect, glm::vec3& color);
-void IntersectObjects(Sphere *spheres, Light l, Pixel px, sf::Image& img);
-void RayCastCamera(Sphere *spheres, Light l, Pixel px, sf::Image& img);
+void LightOnFireTanana(Sphere s, Light l, Pixel px, glm::vec3& color, glm::vec3 intersection_position, glm::vec3 lamp_direction);
+bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::vec3& color);
+void IntersectObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img);
+void RayCastCamera(Sphere *spheres, Light *l, Pixel px, sf::Image& img);
