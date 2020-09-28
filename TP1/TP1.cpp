@@ -5,18 +5,19 @@
 #include <sfml/graphics/image.hpp>
 #include <math.h>
 
-const int color_clamp = 255;
-
 const int nb_spheres = 2;
 const int nb_lights = 3;
+
+
+const int color_clamp = 255 ^ nb_lights;
 
 int main()
 {
   sf::Image img;
   Camera c;
 
-  c.height = 800;
-  c.width = 800;
+  c.height = 1080;
+  c.width = 1920;
   c.img = img;
 
   c.img.create(c.width, c.height);
@@ -24,19 +25,19 @@ int main()
   Ray r;
 
   Sphere s1;
-  s1.center = glm::vec3(c.width/2, c.height/2, 500);
+  s1.center = glm::vec3(400, 400, 500);
   s1.radius = 200.0;
   s1.color = glm::vec3(255, 255, 255);
   s1.albedo = glm::vec3(1, 1, 1);
 
   Sphere s2;
-  s2.center = glm::vec3(c.width/2, c.height/2, 300);
+  s2.center = glm::vec3(400, 400, 300);
   s2.radius = 100.0;
   s2.color = glm::vec3(255, 0, 0);
   s2.albedo = glm::vec3(1, 1, 1);
 
   Sphere s3;
-  s3.center = glm::vec3(c.width, c.height, 0);
+  s3.center = glm::vec3(800, 800, 0);
   s3.radius = 200.0;
   s3.color = glm::vec3(0, 177, 100);
   s3.albedo = glm::vec3(1, 1, 1);
@@ -45,15 +46,15 @@ int main()
 
   //Light
   Light l1;
-  l1.position = glm::vec3(c.width/2, c.height/2, -300);
+  l1.position = glm::vec3(400, 400, -300);
   l1.l_e = glm::vec3(1000, 1000, 1000);
 
   Light l2;
-  l2.position = glm::vec3(0, 0, 0);
+  l2.position = glm::vec3(0, 0, -0);
   l2.l_e = glm::vec3(1000, 0, 0);
 
   Light l3;
-  l3.position = glm::vec3(c.width, 0, 0);
+  l3.position = glm::vec3(800, 0, 0);
   l3.l_e = glm::vec3(0, 0, 1000);
 
   Light lights[nb_lights] = {l1, l2, l3};
@@ -154,8 +155,8 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
       }
     }
   }
-
   color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
+
   return path_to_light;
 }
 
