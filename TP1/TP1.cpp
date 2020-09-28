@@ -5,9 +5,17 @@
 #include <sfml/graphics/image.hpp>
 #include <math.h>
 
+
+  // Grid :
+  // 0 ------------> x
+  // |
+  // |
+  // |
+  // V
+  // y
+
 const int nb_spheres = 2;
 const int nb_lights = 3;
-
 
 const int color_clamp = 255 ^ nb_lights;
 
@@ -76,16 +84,9 @@ int main()
       px.y = y;
 
       //IntersectObject(s1, l, px, c.img);
-      IntersectObjects(spheres, lights, px, c.img);
+      RayCastCamera(spheres, lights, px, c.img);
     }
   }
-
-  // 0 ------------> x
-  // |
-  // |
-  // |
-  // V
-  // y
 
   CreateWindow(c);
 
