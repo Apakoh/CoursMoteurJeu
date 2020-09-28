@@ -30,8 +30,6 @@ int main()
 
   c.img.create(c.width, c.height);
 
-  Ray r;
-
   Sphere s1;
   s1.center = glm::vec3(400, 400, 500);
   s1.radius = 200.0;
@@ -71,10 +69,19 @@ int main()
   sc.camera = c;
   sc.light = l1;
 
+  RayCastCamera(c, spheres, lights, c.img);
+  CreateWindow(c);
+
+  return 0;
+}
+
+void RayCastCamera(Camera& c, Sphere *spheres, Light *l, sf::Image& img)
+{
   for(int x = 0; x < c.width; x++)
   {
     for(int y = 0; y < c.height; y++)
     {
+      Ray r;
       r.origin = glm::vec3(x, y, 0);
       r.direction = glm::vec3(0,0,1);
 
@@ -83,25 +90,14 @@ int main()
       px.x = x;
       px.y = y;
 
-      //IntersectObject(s1, l, px, c.img);
-      RayCastCamera(spheres, lights, px, c.img);
+      IntersectObjects(spheres, l, px, c.img);
     }
   }
-
-  CreateWindow(c);
-
-  return 0;
 }
-
 
 void SetPixelCamera(sf::Image& img, int x, int y, glm::vec3 c)
 {
   img.setPixel(x, y, sf::Color(c.x, c.y, c.z));
-}
-
-void RayCastCamera(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
-{
-  IntersectObjects(spheres, l, px, img);
 }
 
 void IntersectObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
