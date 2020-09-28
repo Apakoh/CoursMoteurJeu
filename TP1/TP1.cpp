@@ -15,9 +15,9 @@
   // y
 
 const int nb_spheres = 2;
-const int nb_lights = 3;
+const int nb_lights = 4;
 
-const int color_clamp = 255 ^ nb_lights;
+const int color_clamp = 255;
 
 int main()
 {
@@ -141,9 +141,10 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
     for(int i = 0; i < nb_lights; i++)
     {
       glm::vec3 lamp_direction = l[i].position - intersection_position;
+      glm::vec3 intersection_position_light;
 
       // Sphere to Lamp
-      if(!glm::intersectRaySphere(intersection_position, lamp_direction, s.center, s.radius, intersection_position, intersection_normal))
+      if(!glm::intersectRaySphere(intersection_position, lamp_direction, s.center, s.radius, intersection_position_light, intersection_normal))
       {
         // Calculate color for
         LightOnFireTanana(s, l[i], px, color, intersection_position, lamp_direction);
@@ -167,7 +168,7 @@ void LightOnFireTanana(Sphere s, Light l, Pixel px, glm::vec3& color, glm::vec3 
     float lamp_to_intersect = glm::abs(glm::dot(glm::normalize(intersection_position - s.center), glm::normalize(lamp_direction)));
 
     // Calcul for cos theta
-    float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction), glm::normalize(lamp_direction)));
+    //float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction), glm::normalize(lamp_direction)));
 
     // Albedo
     glm::vec3 albedo = glm::normalize(s.albedo * s.color);
