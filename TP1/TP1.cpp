@@ -7,8 +7,8 @@
 
 const int color_clamp = 255;
 
-const int nb_spheres = 3;
-const int nb_lights = 1;
+const int nb_spheres = 2;
+const int nb_lights = 3;
 
 int main()
 {
@@ -41,14 +41,22 @@ int main()
   s3.color = glm::vec3(0, 177, 100);
   s3.albedo = glm::vec3(1, 1, 1);
 
-  Sphere spheres[nb_spheres] = {s1, s2, s3};
+  Sphere spheres[nb_spheres] = {s1, s3};
 
   //Light
   Light l1;
   l1.position = glm::vec3(c.width/2, c.height/2, -300);
   l1.l_e = glm::vec3(1000, 1000, 1000);
 
-  Light lights[nb_lights] = {l1};
+  Light l2;
+  l2.position = glm::vec3(0, 0, 0);
+  l2.l_e = glm::vec3(1000, 0, 0);
+
+  Light l3;
+  l3.position = glm::vec3(c.width, 0, 0);
+  l3.l_e = glm::vec3(0, 0, 1000);
+
+  Light lights[nb_lights] = {l1, l2, l3};
 
   Scene sc;
   sc.camera = c;
@@ -127,12 +135,11 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
 
   bool path_to_light = false;
 
-  intersect = glm::vec3(0,0,0);
+  color = glm::vec3(0,0,0);
 
   // Pixel to Sphere
   if(glm::intersectRaySphere(px.r.origin, px.r.direction, s.center, s.radius, intersection_position, intersection_normal))
   {
-    //std::cout << sizeof(l) << std::endl;
     for(int i = 0; i < nb_lights; i++)
     {
       glm::vec3 lamp_direction = l[i].position - intersection_position;
@@ -147,6 +154,8 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
       }
     }
   }
+
+  color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
   return path_to_light;
 }
 
@@ -166,8 +175,7 @@ void LightOnFireTanana(Sphere s, Light l, Pixel px, glm::vec3& color, glm::vec3 
     glm::vec3 albedo = glm::normalize(s.albedo * s.color);
 
     // Final Fantasy Calcul : A Real Reborn XII
-    color = l.l_e * lamp_to_intersect * (albedo / (float)M_PI);
-    color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
+    color += l.l_e * lamp_to_intersect * (albedo / (float)M_PI);
 }
 
 void CreateWindow(Camera c)
