@@ -149,7 +149,7 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
     {
       lamp_direction = l[i].position - intersection_position;
       path_to_light = false;
-      
+
       // Sphere to Lamp
       /* for(int j = 0; j < nb_spheres; j++)
       {
@@ -222,9 +222,15 @@ void CreateWindow(Camera c)
             {
               window.close();
             }
+            else if (event.type == sf::Event::Resized)
+            {
+              //window.setSize({ static_cast<float>(event.size.width),static_cast<float>(event.size.height) });
+            }
         }
         window.clear();
         window.draw(sprite);
         window.display();
     }
 }
+
+sf::Event event;
