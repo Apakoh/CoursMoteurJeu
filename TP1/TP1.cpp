@@ -14,8 +14,8 @@
   // V
   // y
 
-const int nb_spheres = 3;
-const int nb_lights = 4;
+const int nb_spheres = 2;
+const int nb_lights = 3;
 
 const int color_clamp = 255;
 
@@ -48,7 +48,7 @@ int main()
   s3.color = glm::vec3(0, 177, 100);
   s3.albedo = glm::vec3(1, 1, 1);
 
-  Sphere spheres[nb_spheres] = {s1, s2, s3};
+  Sphere spheres[nb_spheres] = {s1, s3};
 
   //Light
   Light l1;
@@ -131,7 +131,12 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
   glm::vec3 intersection_position;
   glm::vec3 intersection_normal;
 
-  bool path_to_light = false;
+  glm::vec3 intersection_position_sphere_light;
+
+  glm::vec3 lamp_direction;
+
+  bool path_to_light;
+  bool is_draw = false;
 
   color = glm::vec3(0,0,0);
 
@@ -142,24 +147,41 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
 
     for(int i = 0; i < nb_lights; i++)
     {
-      glm::vec3 lamp_direction = l[i].position - intersection_position;
-      glm::vec3 intersection_position_light;
+      lamp_direction = l[i].position - intersection_position;
+      path_to_light = false;
+      
+      // Sphere to Lamp
+      /* for(int j = 0; j < nb_spheres; j++)
+      {
+        if(glm::intersectRaySphere(intersection_position, lamp_direction, spheres[j].center, spheres[j].radius, intersection_position_sphere_light, intersection_normal))
+        {
+          if(glm::distance(intersection_position, l[i].position) > glm::distance(intersection_position_sphere_light, intersection_position))
+          {
+            // path_to_light = false;
+          }
+        }
+      } */
 
       // Sphere to Lamp
       //for(int j = 0; j < nb_spheres; j++)
       //{
-      if(!glm::intersectRaySphere(intersection_position, lamp_direction, s.center, s.radius, intersection_position_light, intersection_normal))
+      if(!glm::intersectRaySphere(intersection_position, lamp_direction, s.center, s.radius, intersection_position_sphere_light, intersection_normal))
+      {
+        path_to_light = true;
+      }
+
+      if(path_to_light)
       {
         // Calculate color for
         LightOnFireTanana(s, l[i], px, color, intersection_position, lamp_direction);
-        path_to_light = true;
+        is_draw = true;
       }
       //}
     }
   }
   color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
 
-  return path_to_light;
+  return is_draw;
 }
 
 // https://www.youtube.com/watch?v=aTBlKRzNf74
