@@ -43,7 +43,7 @@ int main()
   s2.albedo = glm::vec3(1, 1, 1);
 
   Sphere s3;
-  s3.center = glm::vec3(800, 800, 0);
+  s3.center = glm::vec3(600, 600, 200);
   s3.radius = 400.0;
   s3.color = glm::vec3(0, 177, 100);
   s3.albedo = glm::vec3(1, 1, 1);
