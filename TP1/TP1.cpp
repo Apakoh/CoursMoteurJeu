@@ -105,80 +105,54 @@ void LightsToObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
   glm::vec3 color = glm::vec3(0,0,0);
   glm::vec3 intersection;
 
-  float t = 0;
-  float t_temp;
+  Sphere s = ShortestIntersection(spheres, px, intersection);
 
-  glm::vec3 color_min = glm::vec3(0,0,0);
-
-  for(int i = 0; i < nb_spheres; i++)
-  {
-    if(IntersectObjects(spheres[i], l, px, intersection, color, spheres))
-    {
-      t_temp = glm::distance(intersection, px.r.origin);
-      if(t_temp < t && t > 0);
-      {
-          t = t_temp;
-          color_min = color;
-      }
-    }
-  }
+  IntersectObjects(s, l, px, intersection, color, spheres);
 
   color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
 
   SetPixelCamera(img, px.x, px.y, color);
 }
 
-bool IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::vec3& color, Sphere *spheres)
+void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::vec3& color, Sphere *spheres)
 {
-  glm::vec3 intersection_position;
   glm::vec3 intersection_normal;
-
   glm::vec3 intersection_position_sphere_light;
-
   glm::vec3 lamp_direction;
 
   bool path_to_light;
-  bool is_draw = false;
 
   // Pixel to Sphere
-  if(RaySphereIntersect(px.r.origin, px.r.direction, s.center, s.radius, intersection_position, intersection_normal))
+
+  for(int i = 0; i < nb_lights; i++)
   {
-    intersect = intersection_position;
+    lamp_direction = l[i].position - intersect;
+    path_to_light = false;
 
-    for(int i = 0; i < nb_lights; i++)
+    // Sphere to Lamp
+    for(int j = 0; j < nb_spheres; j++)
     {
-      lamp_direction = l[i].position - intersection_position;
-      path_to_light = false;
-
-      // Sphere to Lamp
-      /*for(int j = 0; j < nb_spheres; j++)
+      if(RaySphereIntersect(intersect, lamp_direction, spheres[j].center, spheres[j].radius, intersection_position_sphere_light, intersection_normal))
       {
-        if(RaySphereIntersect(intersection_position, lamp_direction, spheres[j].center, spheres[j].radius, intersection_position_sphere_light, intersection_normal))
+        if(glm::distance(intersect, l[i].position) > glm::distance(intersection_position_sphere_light, intersect))
         {
-          if(glm::distance(intersection_position, l[i].position) > glm::distance(intersection_position_sphere_light, intersection_position))
-          {
-            path_to_light = false;
-          }
+          path_to_light = false;
         }
-      }*/
-
-
-      // Sphere to Lamp
-      if(!RaySphereIntersect(intersection_position, lamp_direction, s.center, s.radius, intersection_position_sphere_light, intersection_normal))
-      {
-        path_to_light = true;
-      }
-
-      if(path_to_light)
-      {
-        // Calculate color for
-        LightOnFireTanana(s, l[i], px, color, intersection_position, lamp_direction);
-        is_draw = true;
       }
     }
-  }
 
-  return is_draw;
+    // Sphere to Lamp
+    if(!RaySphereIntersect(intersect, lamp_direction, s.center, s.radius, intersection_position_sphere_light, intersection_normal))
+    {
+      path_to_light = true;
+    }
+
+    if(path_to_light)
+    {
+      // Calculate color for
+      LightOnFireTanana(s, l[i], px, color, intersect, lamp_direction);
+    }
+  }
 }
 
 // https://www.youtube.com/watch?v=aTBlKRzNf74
@@ -228,6 +202,32 @@ void CreateWindow(Camera c)
         window.draw(sprite);
         window.display();
     }
+}
+
+Sphere ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection)
+{
+  glm::vec3 intersection_position;
+  glm::vec3 intersection_normal;
+
+  int indice = 0;
+  float distance = 0;
+  float distance_temp;
+
+  for(int i = 0; i < nb_spheres; i++)
+  {
+    if(RaySphereIntersect(px.r.origin, px.r.direction, spheres[i].center, spheres[i].radius, intersection_position, intersection_normal))
+    {
+      distance_temp = glm::distance(intersection_position, px.r.origin);
+      if(distance_temp < distance && distance > 0);
+      {
+          intersection = intersection_position;
+          distance = distance_temp;
+          indice = i;
+      }
+    }
+  }
+
+  return spheres[indice];
 }
 
 bool RaySphereIntersect(glm::vec3 &r_origin, glm::vec3 &r_direction, glm::vec3 &sphere_center, float sphere_radius, glm::vec3 &position, glm::vec3 &normal)
