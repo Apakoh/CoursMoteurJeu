@@ -24,8 +24,8 @@ int main()
   sf::Image img;
   Camera c;
 
-  c.height = 1080;
-  c.width = 1920;
+  c.height = 800;
+  c.width = 800;
   c.img = img;
 
   c.img.create(c.width, c.height);
@@ -38,13 +38,13 @@ int main()
 
   Sphere s2;
   s2.center = glm::vec3(100, 100, 100);
-  s2.radius = 100.0;
+  s2.radius = 200.0;
   s2.color = glm::vec3(255, 0, 0);
   s2.albedo = glm::vec3(1, 1, 1);
 
   Sphere s3;
   s3.center = glm::vec3(800, 800, 0);
-  s3.radius = 200.0;
+  s3.radius = 400.0;
   s3.color = glm::vec3(0, 177, 100);
   s3.albedo = glm::vec3(1, 1, 1);
 
@@ -90,7 +90,7 @@ void RayCastCamera(Camera& c, Sphere *spheres, Light *l, sf::Image& img)
       px.x = x;
       px.y = y;
 
-      IntersectObjects(spheres, l, px, c.img);
+      LightsToObjects(spheres, l, px, c.img);
     }
   }
 }
@@ -100,9 +100,9 @@ void SetPixelCamera(sf::Image& img, int x, int y, glm::vec3 c)
   img.setPixel(x, y, sf::Color(c.x, c.y, c.z));
 }
 
-void IntersectObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
+void LightsToObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
 {
-  glm::vec3 color;
+  glm::vec3 color = glm::vec3(0,0,0);
   glm::vec3 intersection;
 
   float t = 0;
@@ -112,7 +112,7 @@ void IntersectObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
 
   for(int i = 0; i < nb_spheres; i++)
   {
-    if(IntersectObject(spheres[i], l, px, intersection, color, spheres))
+    if(IntersectObjects(spheres[i], l, px, intersection, color, spheres))
     {
       t_temp = glm::distance(intersection, px.r.origin);
       if(t_temp < t && t > 0);
@@ -123,10 +123,12 @@ void IntersectObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
     }
   }
 
-  SetPixelCamera(img, px.x, px.y, color_min);
+  color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
+
+  SetPixelCamera(img, px.x, px.y, color);
 }
 
-bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::vec3& color, Sphere *spheres)
+bool IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::vec3& color, Sphere *spheres)
 {
   glm::vec3 intersection_position;
   glm::vec3 intersection_normal;
@@ -137,8 +139,6 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
 
   bool path_to_light;
   bool is_draw = false;
-
-  color = glm::vec3(0,0,0);
 
   // Pixel to Sphere
   if(RaySphereIntersect(px.r.origin, px.r.direction, s.center, s.radius, intersection_position, intersection_normal))
@@ -151,7 +151,7 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
       path_to_light = false;
 
       // Sphere to Lamp
-      /* for(int j = 0; j < nb_spheres; j++)
+      /*for(int j = 0; j < nb_spheres; j++)
       {
         if(RaySphereIntersect(intersection_position, lamp_direction, spheres[j].center, spheres[j].radius, intersection_position_sphere_light, intersection_normal))
         {
@@ -160,12 +160,10 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
             path_to_light = false;
           }
         }
-      } */
+      }*/
 
 
       // Sphere to Lamp
-      //for(int j = 0; j < nb_spheres; j++)
-      //{
       if(!RaySphereIntersect(intersection_position, lamp_direction, s.center, s.radius, intersection_position_sphere_light, intersection_normal))
       {
         path_to_light = true;
@@ -177,10 +175,8 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
         LightOnFireTanana(s, l[i], px, color, intersection_position, lamp_direction);
         is_draw = true;
       }
-      //}
     }
   }
-  color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
 
   return is_draw;
 }
