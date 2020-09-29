@@ -32,7 +32,7 @@ int main()
 
   Sphere s1;
   s1.center = glm::vec3(400, 400, 400);
-  s1.radius = 200.0;
+  s1.radius = 400.0;
   s1.color = glm::vec3(255, 255, 255);
   s1.albedo = glm::vec3(1, 1, 1);
 
@@ -141,7 +141,7 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
   color = glm::vec3(0,0,0);
 
   // Pixel to Sphere
-  if(glm::intersectRaySphere(px.r.origin, px.r.direction, s.center, s.radius, intersection_position, intersection_normal))
+  if(RaySphereIntersect(px.r.origin, px.r.direction, s.center, s.radius, intersection_position, intersection_normal))
   {
     intersect = intersection_position;
 
@@ -153,19 +153,20 @@ bool IntersectObject(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::ve
       // Sphere to Lamp
       /* for(int j = 0; j < nb_spheres; j++)
       {
-        if(glm::intersectRaySphere(intersection_position, lamp_direction, spheres[j].center, spheres[j].radius, intersection_position_sphere_light, intersection_normal))
+        if(RaySphereIntersect(intersection_position, lamp_direction, spheres[j].center, spheres[j].radius, intersection_position_sphere_light, intersection_normal))
         {
           if(glm::distance(intersection_position, l[i].position) > glm::distance(intersection_position_sphere_light, intersection_position))
           {
-            // path_to_light = false;
+            path_to_light = false;
           }
         }
       } */
 
+
       // Sphere to Lamp
       //for(int j = 0; j < nb_spheres; j++)
       //{
-      if(!glm::intersectRaySphere(intersection_position, lamp_direction, s.center, s.radius, intersection_position_sphere_light, intersection_normal))
+      if(!RaySphereIntersect(intersection_position, lamp_direction, s.center, s.radius, intersection_position_sphere_light, intersection_normal))
       {
         path_to_light = true;
       }
@@ -233,4 +234,44 @@ void CreateWindow(Camera c)
     }
 }
 
-sf::Event event;
+bool RaySphereIntersect(glm::vec3 &r_origin, glm::vec3 &r_direction, glm::vec3 &sphere_center, float sphere_radius, glm::vec3 &position, glm::vec3 &normal)
+{
+    float t0, t1, t;
+
+    sphere_radius *= 100;
+    glm::vec3 ray_sphere_direction = sphere_center - r_origin;
+    float tca = glm::dot(ray_sphere_direction, r_direction);
+
+    if (tca < 0) {
+        return false;
+    }
+
+    float d2 = glm::dot(ray_sphere_direction, ray_sphere_direction) - tca * tca;
+
+    if (d2 > sphere_radius) {
+        return false;
+    }
+
+    float thc = sqrt(sphere_radius - d2);
+
+    t0 = tca - thc;
+    t1 = tca + thc;
+
+    if (t0 > t1) {
+        std::swap(t0, t1);
+    }
+
+    if (t0 < 0) {
+        t0 = t1;
+        if (t0 < 0) {
+            return false;
+        }
+    }
+
+    t = t0;
+
+    position = r_origin + t * r_direction;
+    normal = glm::normalize(position - sphere_center);
+
+    return true;
+}
