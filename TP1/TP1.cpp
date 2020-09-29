@@ -52,8 +52,8 @@ int main()
 
   //Light
   Light l1;
-  l1.position = glm::vec3(400, 400, -300);
-  l1.l_e = glm::vec3(1000, 1000, 1000);
+  l1.position = glm::vec3(600, 800, -650);
+  l1.l_e = glm::vec3(500, 500, 500);
 
   Light l2;
   l2.position = glm::vec3(0, 0, 0);
@@ -132,7 +132,7 @@ void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::v
   for(int i = 0; i < nb_lights; i++)
   {
     lamp_direction = l[i].position - intersect;
-    path_to_light = false;
+    path_to_light = true;
 
     // Sphere to Lamp
     for(int j = 0; j < nb_spheres; j++)
@@ -141,16 +141,16 @@ void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::v
       {
         if(glm::distance(intersect, l[i].position) > glm::distance(intersection_position_sphere_light, intersect))
         {
-          //path_to_light = false;
+          path_to_light = false;
         }
       }
     }
 
     // Sphere to Lamp
-    if(!RaySphereIntersect(intersect, lamp_direction, s.center, s.radius, intersection_position_sphere_light, intersection_normal))
+    /*if(!RaySphereIntersect(intersect, lamp_direction, s.center, s.radius, intersection_position_sphere_light, intersection_normal))
     {
-      path_to_light = true;
-    }
+      //path_to_light = true;
+    } */
 
     if(path_to_light)
     {
