@@ -105,7 +105,12 @@ void LightsToObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
   glm::vec3 color = glm::vec3(0,0,0);
   glm::vec3 intersection;
 
-  Sphere s = ShortestIntersection(spheres, px, intersection);
+  Sphere s;
+
+  if(!ShortestIntersection(spheres, px, intersection, s))
+  {
+    return;
+  }
 
   IntersectObjects(s, l, px, intersection, color, spheres);
 
@@ -136,7 +141,7 @@ void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::v
       {
         if(glm::distance(intersect, l[i].position) > glm::distance(intersection_position_sphere_light, intersect))
         {
-          path_to_light = false;
+          //path_to_light = false;
         }
       }
     }
@@ -204,7 +209,7 @@ void CreateWindow(Camera c)
     }
 }
 
-Sphere ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection)
+bool ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection, Sphere& sph)
 {
   glm::vec3 intersection_position;
   glm::vec3 intersection_normal;
@@ -213,6 +218,8 @@ Sphere ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection)
   float distance = 0;
   float distance_temp;
 
+  bool intersect = false;
+
   for(int i = 0; i < nb_spheres; i++)
   {
     if(RaySphereIntersect(px.r.origin, px.r.direction, spheres[i].center, spheres[i].radius, intersection_position, intersection_normal))
@@ -220,6 +227,7 @@ Sphere ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection)
       distance_temp = glm::distance(intersection_position, px.r.origin);
       if(distance_temp < distance && distance > 0);
       {
+          intersect = true;
           intersection = intersection_position;
           distance = distance_temp;
           indice = i;
@@ -227,7 +235,8 @@ Sphere ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection)
     }
   }
 
-  return spheres[indice];
+  sph = spheres[indice];
+  return intersect;
 }
 
 bool RaySphereIntersect(glm::vec3 &r_origin, glm::vec3 &r_direction, glm::vec3 &sphere_center, float sphere_radius, glm::vec3 &position, glm::vec3 &normal)

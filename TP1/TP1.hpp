@@ -50,7 +50,7 @@ class Scene
 
 void CreateWindow(Camera c);
 bool RaySphereIntersect(glm::vec3 &r_origin, glm::vec3 &r_direction, glm::vec3 &sphere_center, float sphere_radius, glm::vec3 &position, glm::vec3 &normal);
-Sphere ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection);
+bool ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection, Sphere& sph);
 void SetPixelCamera(sf::Image& img, int x, int y, glm::vec3 color);
 void LightOnFireTanana(Sphere s, Light l, Pixel px, glm::vec3& color, glm::vec3 intersection_position, glm::vec3 lamp_direction);
 void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::vec3& color, Sphere *spheres);
