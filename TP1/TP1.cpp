@@ -52,8 +52,8 @@ int main()
 
   //Light
   Light l1;
-  l1.position = glm::vec3(600, 800, -650);
-  l1.l_e = glm::vec3(500, 500, 500);
+  l1.position = glm::vec3(100, 800, -650);
+  l1.l_e = glm::vec3(1000, 1000, 1000);
 
   Light l2;
   l2.position = glm::vec3(0, 0, 0);
@@ -142,15 +142,10 @@ void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::v
         if(glm::distance(intersect, l[i].position) > glm::distance(intersection_position_sphere_light, intersect))
         {
           path_to_light = false;
+          break;
         }
       }
     }
-
-    // Sphere to Lamp
-    /*if(!RaySphereIntersect(intersect, lamp_direction, s.center, s.radius, intersection_position_sphere_light, intersection_normal))
-    {
-      //path_to_light = true;
-    } */
 
     if(path_to_light)
     {
@@ -164,7 +159,10 @@ void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::v
 void LightOnFireTanana(Sphere s, Light l, Pixel px, glm::vec3& color, glm::vec3 intersection_position, glm::vec3 lamp_direction)
 {
     // Calcul of D
-    float distance_carre = lamp_direction.x * lamp_direction.x  + lamp_direction.y * lamp_direction.y  + lamp_direction.z * lamp_direction.z;
+    float x = (intersection_position.x - l.position.x);
+    float y = (intersection_position.y - l.position.y);
+    float z = (intersection_position.z - l.position.z);
+    float distance_carre = x * x + y * y + z * z;
 
     // Normal of lamp_direction
     float lamp_to_intersect = glm::abs(glm::dot(glm::normalize(intersection_position - s.center), glm::normalize(lamp_direction)));
@@ -173,10 +171,13 @@ void LightOnFireTanana(Sphere s, Light l, Pixel px, glm::vec3& color, glm::vec3 
     //float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction), glm::normalize(lamp_direction)));
 
     // Albedo
-    glm::vec3 albedo = glm::normalize(s.albedo * s.color);
+    glm::vec3 albedo = glm::normalize(s.albedo);
+
+    // l.l_e / d²
+    glm::vec3 le = glm::vec3(l.l_e.x * l.l_e.x / distance_carre, l.l_e.y * l.l_e.y / distance_carre, l.l_e.z * l.l_e.z / distance_carre);
 
     // Final Fantasy Calcul : A Real Reborn XII
-    color += l.l_e * lamp_to_intersect * (albedo / (float)M_PI);
+    color += le * (albedo / (float)M_PI) * lamp_to_intersect * s.color;
 }
 
 void CreateWindow(Camera c)
