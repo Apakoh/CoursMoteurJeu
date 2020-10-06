@@ -13,9 +13,6 @@
   // V
   // y
 
-const int nb_spheres = 2;
-const int nb_lights = 3;
-
 const int color_clamp = 255;
 
 const glm::vec3 color_bg = glm::vec3(0, 0, 0);
@@ -27,21 +24,27 @@ int main()
 
   c.img->create(c.width, c.height);
 
-  // Spheres : Center / Radius / Albedo (color)
-  Sphere s1 = Sphere(glm::vec3(400, 400, 900), 400.0, glm::vec3(255, 255, 255));
-  Sphere s2 = Sphere(glm::vec3(100, 100, 100), 200.0, glm::vec3(255, 0, 0));
-  Sphere s3 = Sphere(glm::vec3(600, 600, 400), 400.0, glm::vec3(0, 177, 100));
+  Scene main_scene = Scene(&c);
 
-  Sphere spheres[nb_spheres] = {s1, s3};
+  // Spheres : Center / Radius / Albedo (color)
+  Sphere s1 = Sphere(glm::vec3(400, 400, 900), 100.0, glm::vec3(255, 255, 255));
+  Sphere s2 = Sphere(glm::vec3(100, 100, 100), 200.0, glm::vec3(255, 0, 0));
+  Sphere s3 = Sphere(glm::vec3(600, 600, 400), 100.0, glm::vec3(0, 177, 100));
+
+  main_scene.AddSphere(s1);
+  main_scene.AddSphere(s3);
 
   //Lights : Center / Light Power + color
   Light l1 = Light(glm::vec3(100, 800, -650), glm::vec3(1000, 1000, 1000));
   Light l2 = Light(glm::vec3(0, 0, 0), glm::vec3(800, 0, 0));
   Light l3 = Light(glm::vec3(800, 0, 0), glm::vec3(0, 0, 800));
 
-  Light lights[nb_lights] = {l1, l2, l3};
+  main_scene.AddLight(l1);
+  main_scene.AddLight(l2);
+  main_scene.AddLight(l3);
 
-  Scene main_scene = Scene(&c, lights, spheres);
+  std::cout << main_scene.lights[0].position.x << std::endl;
+  std::cout << main_scene.spheres[0].radius  << std::endl;
 
   RayCastCamera(&main_scene);
   CreateWindow(c);
@@ -82,19 +85,19 @@ void LightsToObjects(Scene* _scene, Pixel* px)
 
   Sphere s;
 
-  if(!ShortestIntersection(_scene->spheres, px, intersection, normal, s))
+  if(!ShortestIntersection(_scene, px, intersection, normal, s))
   {
     return;
   }
 
-  IntersectObjects(s, _scene->lights, _scene->spheres, px, intersection, normal, color);
+  IntersectObjects(s, _scene, px, intersection, normal, color);
 
   color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
 
   SetPixelCamera(_scene->camera->img, px->x, px->y, color);
 }
 
-void IntersectObjects(Sphere s, Light *l, Sphere *spheres, Pixel* px, glm::vec3& intersect, glm::vec3& normal, glm::vec3& color)
+void IntersectObjects(Sphere& s, Scene* _scene, Pixel* px, glm::vec3& intersect, glm::vec3& normal, glm::vec3& color)
 {
   glm::vec3 intersection_normal;
   glm::vec3 intersection_position_sphere_light;
@@ -102,15 +105,15 @@ void IntersectObjects(Sphere s, Light *l, Sphere *spheres, Pixel* px, glm::vec3&
 
   bool path_to_light;
 
-  for(int i = 0; i < nb_lights; i++)
+  for(int i = 0; i < _scene->nb_light; i++)
   {
-    lamp_direction = glm::normalize(l[i].position - intersect);
+    lamp_direction = glm::normalize(_scene->lights[i].position - intersect);
     path_to_light = true;
 
     // Sphere to Lamp
-    for(int j = 0; j < nb_spheres; j++)
+    for(int j = 0; j < _scene->nb_sphere; j++)
     {
-        if(RaySphereIntersect(intersect, lamp_direction, spheres[j].center, spheres[j].radius, intersection_position_sphere_light, intersection_normal))
+        if(RaySphereIntersect(intersect, lamp_direction, _scene->spheres[j].center, _scene->spheres[j].radius, intersection_position_sphere_light, intersection_normal))
         {
           path_to_light = false;
           break;
@@ -120,7 +123,7 @@ void IntersectObjects(Sphere s, Light *l, Sphere *spheres, Pixel* px, glm::vec3&
     if(path_to_light)
     {
       // Calculate color for
-      LightOnFireTanana(s, l[i], px, color, intersect, normal, lamp_direction);
+      LightOnFireTanana(s, _scene->lights[i], px, color, intersect, normal, lamp_direction);
     }
   }
 }
@@ -188,7 +191,7 @@ void CreateWindow(Camera c)
     }
 }
 
-bool ShortestIntersection(Sphere *spheres, Pixel* px, glm::vec3& intersection, glm::vec3& normal, Sphere& sph)
+bool ShortestIntersection(Scene* _scene, Pixel* px, glm::vec3& intersection, glm::vec3& normal, Sphere& sph)
 {
   glm::vec3 intersection_position;
   glm::vec3 intersection_normal;
@@ -199,9 +202,9 @@ bool ShortestIntersection(Sphere *spheres, Pixel* px, glm::vec3& intersection, g
 
   bool intersect = false;
 
-  for(int i = 0; i < nb_spheres; i++)
+  for(int i = 0; i < _scene->nb_sphere; i++)
   {
-    if(RaySphereIntersect(px->r.origin, px->r.direction, spheres[i].center, spheres[i].radius, intersection_position, intersection_normal))
+    if(RaySphereIntersect(px->r.origin, px->r.direction, _scene->spheres[i].center, _scene->spheres[i].radius, intersection_position, intersection_normal))
     {
       distance_temp = glm::distance(intersection_position, px->r.origin);
       if(distance_temp < distance && distance > 0);
@@ -215,6 +218,6 @@ bool ShortestIntersection(Sphere *spheres, Pixel* px, glm::vec3& intersection, g
     }
   }
 
-  sph = spheres[indice];
+  sph = _scene->spheres[indice];
   return intersect;
 }

@@ -11,4 +11,6 @@ class Light
     position = _position;
     l_e = _l_e;
   }
+
+  Light(){}
 };

@@ -14,8 +14,5 @@ class Sphere
       color = _color;
     }
 
-    Sphere()
-    {
-      
-    }
+    Sphere(){}
 };
