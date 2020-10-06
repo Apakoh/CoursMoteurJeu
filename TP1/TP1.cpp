@@ -39,17 +39,9 @@ int main()
   Sphere spheres[nb_spheres] = {s1, s3};
 
   //Light
-  Light l1;
-  l1.position = glm::vec3(100, 800, -650);
-  l1.l_e = glm::vec3(1000, 1000, 1000);
-
-  Light l2;
-  l2.position = glm::vec3(0, 0, 0);
-  l2.l_e = glm::vec3(800, 0, 0);
-
-  Light l3;
-  l3.position = glm::vec3(800, 0, 0);
-  l3.l_e = glm::vec3(0, 0, 800);
+  Light l1 = Light(glm::vec3(100, 800, -650), glm::vec3(1000, 1000, 1000));
+  Light l2 = Light(glm::vec3(0, 0, 0), glm::vec3(800, 0, 0));
+  Light l3 = Light(glm::vec3(800, 0, 0), glm::vec3(0, 0, 800));
 
   Light lights[nb_lights] = {l1, l2, l3};
 

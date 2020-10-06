@@ -2,6 +2,7 @@
 #include <sfml/graphics.hpp>
 #include <sfml/graphics/image.hpp>
 #include "Sphere.cpp"
+#include "Light.cpp"
 
 class Ray
 {
@@ -16,13 +17,6 @@ class Camera
   unsigned int height;
   unsigned int width;
   sf::Image img;
-};
-
-class Light
-{
-  public:
-    glm::vec3 position;
-    glm::vec3 l_e;
 };
 
 class Pixel
