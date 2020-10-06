@@ -1,5 +1,7 @@
 Atom :
   - C++ Compiler : gpp-compiler
+  - Auto Complete : autocomplete-clang
+  - Error Highlight : linter
   - https://osdn.net/projects/mingw/releases/ (In order to make the compiler to work)
   - As Compiler option : -I <Path> (=> -I ../libraries)
   - For SFML : As Compiler option : -lsfml-graphics -lsfml-window -lsfml-system
