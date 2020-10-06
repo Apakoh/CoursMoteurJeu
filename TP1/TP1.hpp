@@ -1,31 +1,9 @@
 #include <glm/glm.hpp>
 #include <sfml/graphics.hpp>
 #include <sfml/graphics/image.hpp>
-#include "Sphere.cpp"
-#include "Light.cpp"
+#include "Pixel.cpp"
+#include "Scene.cpp"
 
-class Ray
-{
-  public:
-    glm::vec3 origin;
-    glm::vec3 direction;
-};
-
-class Camera
-{
-  public:
-  unsigned int height;
-  unsigned int width;
-  sf::Image img;
-};
-
-class Pixel
-{
-  public:
-    Ray r;
-    int x;
-    int y;
-};
 
 void CreateWindow(Camera c);
 bool RaySphereIntersect(glm::vec3 &r_origin, glm::vec3 &r_direction, glm::vec3 &sphere_center, float sphere_radius, glm::vec3 &position, glm::vec3 &normal);

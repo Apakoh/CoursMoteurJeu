@@ -2,7 +2,6 @@
 #include <iostream>
 #include <glm/gtx/intersect.hpp>
 #include <sfml/graphics.hpp>
-#include <sfml/graphics/image.hpp>
 #include <math.h>
 
 
