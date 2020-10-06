@@ -53,10 +53,6 @@ int main()
 
   Light lights[nb_lights] = {l1, l2, l3};
 
-  Scene sc;
-  sc.camera = c;
-  sc.light = l1;
-
   RayCastCamera(c, spheres, lights, c.img);
   CreateWindow(c);
 

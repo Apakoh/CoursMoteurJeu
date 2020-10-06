@@ -33,13 +33,6 @@ class Pixel
     int y;
 };
 
-class Scene
-{
-  public:
-    Camera camera;
-    Light light;
-};
-
 void CreateWindow(Camera c);
 bool RaySphereIntersect(glm::vec3 &r_origin, glm::vec3 &r_direction, glm::vec3 &sphere_center, float sphere_radius, glm::vec3 &position, glm::vec3 &normal);
 bool ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection, glm::vec3& normal, Sphere& sph);
