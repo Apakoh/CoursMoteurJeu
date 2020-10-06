@@ -19,6 +19,8 @@ const int nb_lights = 3;
 
 const int color_clamp = 255;
 
+const glm::vec3 color_bg = glm::vec3(147, 200, 180);
+
 int main()
 {
   sf::Image img;
@@ -31,7 +33,7 @@ int main()
   c.img.create(c.width, c.height);
 
   Sphere s1;
-  s1.center = glm::vec3(400, 400, 400);
+  s1.center = glm::vec3(400, 400, 900);
   s1.radius = 400.0;
   s1.color = glm::vec3(255, 255, 255);
   s1.albedo = glm::vec3(1, 1, 1);
@@ -43,7 +45,7 @@ int main()
   s2.albedo = glm::vec3(1, 1, 1);
 
   Sphere s3;
-  s3.center = glm::vec3(600, 600, 200);
+  s3.center = glm::vec3(600, 600, 400);
   s3.radius = 400.0;
   s3.color = glm::vec3(0, 177, 100);
   s3.albedo = glm::vec3(1, 1, 1);
@@ -57,11 +59,11 @@ int main()
 
   Light l2;
   l2.position = glm::vec3(0, 0, 0);
-  l2.l_e = glm::vec3(1000, 0, 0);
+  l2.l_e = glm::vec3(800, 0, 0);
 
   Light l3;
   l3.position = glm::vec3(800, 0, 0);
-  l3.l_e = glm::vec3(0, 0, 1000);
+  l3.l_e = glm::vec3(0, 0, 800);
 
   Light lights[nb_lights] = {l1, l2, l3};
 
@@ -104,22 +106,23 @@ void LightsToObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
 {
   glm::vec3 color = glm::vec3(0,0,0);
   glm::vec3 intersection;
+  glm::vec3 normal;
 
   Sphere s;
 
-  if(!ShortestIntersection(spheres, px, intersection, s))
+  if(!ShortestIntersection(spheres, px, intersection, normal, s))
   {
     return;
   }
 
-  IntersectObjects(s, l, px, intersection, color, spheres);
+  IntersectObjects(s, l, px, intersection, normal, color, spheres);
 
   color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
 
   SetPixelCamera(img, px.x, px.y, color);
 }
 
-void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::vec3& color, Sphere *spheres)
+void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::vec3& normal, glm::vec3& color, Sphere *spheres)
 {
   glm::vec3 intersection_normal;
   glm::vec3 intersection_position_sphere_light;
@@ -127,36 +130,31 @@ void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::v
 
   bool path_to_light;
 
-  // Pixel to Sphere
-
   for(int i = 0; i < nb_lights; i++)
   {
-    lamp_direction = l[i].position - intersect;
+    lamp_direction = glm::normalize(l[i].position - intersect);
     path_to_light = true;
 
     // Sphere to Lamp
     for(int j = 0; j < nb_spheres; j++)
     {
-      if(RaySphereIntersect(intersect, lamp_direction, spheres[j].center, spheres[j].radius, intersection_position_sphere_light, intersection_normal))
-      {
-        if(glm::distance(intersect, l[i].position) > glm::distance(intersection_position_sphere_light, intersect))
+        if(RaySphereIntersect(intersect, lamp_direction, spheres[j].center, spheres[j].radius, intersection_position_sphere_light, intersection_normal))
         {
           path_to_light = false;
           break;
         }
-      }
     }
 
     if(path_to_light)
     {
       // Calculate color for
-      LightOnFireTanana(s, l[i], px, color, intersect, lamp_direction);
+      LightOnFireTanana(s, l[i], px, color, intersect, normal, lamp_direction);
     }
   }
 }
 
 // https://www.youtube.com/watch?v=aTBlKRzNf74
-void LightOnFireTanana(Sphere s, Light l, Pixel px, glm::vec3& color, glm::vec3 intersection_position, glm::vec3 lamp_direction)
+void LightOnFireTanana(Sphere s, Light l, Pixel px, glm::vec3& color, glm::vec3& intersection_position, glm::vec3& normal, glm::vec3& lamp_direction)
 {
     // Calcul of D
     float x = (intersection_position.x - l.position.x);
@@ -165,19 +163,27 @@ void LightOnFireTanana(Sphere s, Light l, Pixel px, glm::vec3& color, glm::vec3 
     float distance_carre = x * x + y * y + z * z;
 
     // Normal of lamp_direction
-    float lamp_to_intersect = glm::abs(glm::dot(glm::normalize(intersection_position - s.center), glm::normalize(lamp_direction)));
-
-    // Calcul for cos theta
-    //float cos_theta = glm::abs(glm::dot(glm::normalize(px.r.direction), glm::normalize(lamp_direction)));
-
-    // Albedo
-    glm::vec3 albedo = glm::normalize(s.albedo);
+    float lamp_to_intersect = glm::abs(glm::dot(normal, lamp_direction));
 
     // l.l_e / d²
     glm::vec3 le = glm::vec3(l.l_e.x * l.l_e.x / distance_carre, l.l_e.y * l.l_e.y / distance_carre, l.l_e.z * l.l_e.z / distance_carre);
 
+    // Light vector
+    glm::vec3 light_vector = glm::normalize(intersection_position - l.position);
+    // Calcul for angle
+    float angle = glm::dot(normal, -light_vector);
+
     // Final Fantasy Calcul : A Real Reborn XII
-    color += le * (albedo / (float)M_PI) * lamp_to_intersect * s.color;
+    //color += le * (angle / (float)M_PI) * lamp_to_intersect * s.color;
+
+    if(angle <= 0)
+    {
+      color = color_bg;
+    }
+    else
+    {
+          color += s.color * le * angle;
+    }
 }
 
 void CreateWindow(Camera c)
@@ -210,7 +216,7 @@ void CreateWindow(Camera c)
     }
 }
 
-bool ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection, Sphere& sph)
+bool ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection, glm::vec3& normal, Sphere& sph)
 {
   glm::vec3 intersection_position;
   glm::vec3 intersection_normal;
@@ -230,6 +236,7 @@ bool ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection, Sp
       {
           intersect = true;
           intersection = intersection_position;
+          normal = intersection_normal;
           distance = distance_temp;
           indice = i;
       }
