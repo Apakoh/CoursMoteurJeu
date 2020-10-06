@@ -58,14 +58,10 @@ void RayCastCamera(Scene* _scene)
   {
     for(int y = 0; y < _scene->camera->height; y++)
     {
-      Ray r;
-      r.origin = glm::vec3(x, y, 0);
-      r.direction = glm::vec3(0,0,1);
+      // Ray : Coordinates of the Pixel / Direction of the Ray
+      Ray r = Ray(glm::vec3(x, y, 0), glm::vec3(0,0,1));
 
-      Pixel px;
-      px.r = r;
-      px.x = x;
-      px.y = y;
+      Pixel px = Pixel(&r, x, y);
 
       LightsToObjects(_scene, &px);
     }
@@ -204,9 +200,9 @@ bool ShortestIntersection(Scene* _scene, Pixel* px, glm::vec3& intersection, glm
 
   for(int i = 0; i < _scene->nb_sphere; i++)
   {
-    if(RaySphereIntersect(px->r.origin, px->r.direction, _scene->spheres[i].center, _scene->spheres[i].radius, intersection_position, intersection_normal))
+    if(RaySphereIntersect(px->r->origin, px->r->direction, _scene->spheres[i].center, _scene->spheres[i].radius, intersection_position, intersection_normal))
     {
-      distance_temp = glm::distance(intersection_position, px->r.origin);
+      distance_temp = glm::distance(intersection_position, px->r->origin);
       if(distance_temp < distance && distance > 0);
       {
           intersect = true;
