@@ -18,7 +18,7 @@ const int nb_lights = 3;
 
 const int color_clamp = 255;
 
-const glm::vec3 color_bg = glm::vec3(147, 200, 180);
+const glm::vec3 color_bg = glm::vec3(0, 0, 0);
 
 int main()
 {
@@ -27,13 +27,14 @@ int main()
 
   c.img->create(c.width, c.height);
 
+  // Spheres
   Sphere s1 = Sphere(glm::vec3(400, 400, 900), 400.0, glm::vec3(255, 255, 255));
   Sphere s2 = Sphere(glm::vec3(100, 100, 100), 200.0, glm::vec3(255, 0, 0));
   Sphere s3 = Sphere(glm::vec3(600, 600, 400), 400.0, glm::vec3(0, 177, 100));
 
   Sphere spheres[nb_spheres] = {s1, s3};
 
-  //Light
+  //Lights
   Light l1 = Light(glm::vec3(100, 800, -650), glm::vec3(1000, 1000, 1000));
   Light l2 = Light(glm::vec3(0, 0, 0), glm::vec3(800, 0, 0));
   Light l3 = Light(glm::vec3(800, 0, 0), glm::vec3(0, 0, 800));
@@ -216,46 +217,4 @@ bool ShortestIntersection(Sphere *spheres, Pixel* px, glm::vec3& intersection, g
 
   sph = spheres[indice];
   return intersect;
-}
-
-bool RaySphereIntersect(glm::vec3 &r_origin, glm::vec3 &r_direction, glm::vec3 &sphere_center, float sphere_radius, glm::vec3 &position, glm::vec3 &normal)
-{
-    float t0, t1, t;
-
-    sphere_radius *= 100;
-    glm::vec3 ray_sphere_direction = sphere_center - r_origin;
-    float tca = glm::dot(ray_sphere_direction, r_direction);
-
-    if (tca < 0) {
-        return false;
-    }
-
-    float d2 = glm::dot(ray_sphere_direction, ray_sphere_direction) - tca * tca;
-
-    if (d2 > sphere_radius) {
-        return false;
-    }
-
-    float thc = sqrt(sphere_radius - d2);
-
-    t0 = tca - thc;
-    t1 = tca + thc;
-
-    if (t0 > t1) {
-        std::swap(t0, t1);
-    }
-
-    if (t0 < 0) {
-        t0 = t1;
-        if (t0 < 0) {
-            return false;
-        }
-    }
-
-    t = t0;
-
-    position = r_origin + t * r_direction;
-    normal = glm::normalize(position - sphere_center);
-
-    return true;
 }
