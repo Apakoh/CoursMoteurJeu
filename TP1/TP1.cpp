@@ -27,14 +27,14 @@ int main()
 
   c.img->create(c.width, c.height);
 
-  // Spheres
+  // Spheres : Center / Radius / Albedo (color)
   Sphere s1 = Sphere(glm::vec3(400, 400, 900), 400.0, glm::vec3(255, 255, 255));
   Sphere s2 = Sphere(glm::vec3(100, 100, 100), 200.0, glm::vec3(255, 0, 0));
   Sphere s3 = Sphere(glm::vec3(600, 600, 400), 400.0, glm::vec3(0, 177, 100));
 
   Sphere spheres[nb_spheres] = {s1, s3};
 
-  //Lights
+  //Lights : Center / Light Power + color
   Light l1 = Light(glm::vec3(100, 800, -650), glm::vec3(1000, 1000, 1000));
   Light l2 = Light(glm::vec3(0, 0, 0), glm::vec3(800, 0, 0));
   Light l3 = Light(glm::vec3(800, 0, 0), glm::vec3(0, 0, 800));
