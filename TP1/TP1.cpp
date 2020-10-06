@@ -32,23 +32,9 @@ int main()
 
   c.img.create(c.width, c.height);
 
-  Sphere s1;
-  s1.center = glm::vec3(400, 400, 900);
-  s1.radius = 400.0;
-  s1.color = glm::vec3(255, 255, 255);
-  s1.albedo = glm::vec3(1, 1, 1);
-
-  Sphere s2;
-  s2.center = glm::vec3(100, 100, 100);
-  s2.radius = 200.0;
-  s2.color = glm::vec3(255, 0, 0);
-  s2.albedo = glm::vec3(1, 1, 1);
-
-  Sphere s3;
-  s3.center = glm::vec3(600, 600, 400);
-  s3.radius = 400.0;
-  s3.color = glm::vec3(0, 177, 100);
-  s3.albedo = glm::vec3(1, 1, 1);
+  Sphere s1 = Sphere(glm::vec3(400, 400, 900), 400.0, glm::vec3(255, 255, 255));
+  Sphere s2 = Sphere(glm::vec3(100, 100, 100), 200.0, glm::vec3(255, 0, 0));
+  Sphere s3 = Sphere(glm::vec3(600, 600, 400), 400.0, glm::vec3(0, 177, 100));
 
   Sphere spheres[nb_spheres] = {s1, s3};
 

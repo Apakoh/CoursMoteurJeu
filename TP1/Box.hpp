@@ -1,4 +1,4 @@
-#include <glm/gtx/intersect.hpp>
+#include <glm/glm.hpp>
 #include "TP1.hpp"
 #include "Vector3.cpp"
 

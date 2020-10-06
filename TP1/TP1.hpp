@@ -1,15 +1,7 @@
 #include <glm/glm.hpp>
 #include <sfml/graphics.hpp>
 #include <sfml/graphics/image.hpp>
-
-class Sphere
-{
-  public:
-    float radius;
-    glm::vec3 center;
-    glm::vec3 color;
-    glm::vec3 albedo;
-};
+#include "Sphere.cpp"
 
 class Ray
 {
