@@ -23,13 +23,9 @@ const glm::vec3 color_bg = glm::vec3(147, 200, 180);
 int main()
 {
   sf::Image img;
-  Camera c;
+  Camera c = Camera(800, 800, &img);
 
-  c.height = 800;
-  c.width = 800;
-  c.img = img;
-
-  c.img.create(c.width, c.height);
+  c.img->create(c.width, c.height);
 
   Sphere s1 = Sphere(glm::vec3(400, 400, 900), 400.0, glm::vec3(255, 255, 255));
   Sphere s2 = Sphere(glm::vec3(100, 100, 100), 200.0, glm::vec3(255, 0, 0));
@@ -44,7 +40,7 @@ int main()
 
   Light lights[nb_lights] = {l1, l2, l3};
 
-  RayCastCamera(c, spheres, lights, c.img);
+  RayCastCamera(c, spheres, lights, *c.img);
   CreateWindow(c);
 
   return 0;
@@ -65,7 +61,7 @@ void RayCastCamera(Camera& c, Sphere *spheres, Light *l, sf::Image& img)
       px.x = x;
       px.y = y;
 
-      LightsToObjects(spheres, l, px, c.img);
+      LightsToObjects(spheres, l, px, *c.img);
     }
   }
 }
@@ -164,7 +160,7 @@ void CreateWindow(Camera c)
   sf::RenderWindow window(sf::VideoMode(c.width, c.height), "Main Window");
 
   sf::Texture texture;
-  texture.loadFromImage(c.img);
+  texture.loadFromImage(*c.img);
 
   sf::Sprite sprite;
   sprite.setTexture(texture);

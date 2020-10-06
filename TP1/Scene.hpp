@@ -5,7 +5,14 @@
 class Scene
 {
   public:
-    Camera camera;
+    Camera* camera;
     Light* lights;
     Sphere* spheres;
+
+    Scene(Camera* _camera, Light* _lights, Sphere* _spheres)
+    {
+      camera = _camera;
+      lights = _lights;
+      spheres = _spheres;
+    }
 };
