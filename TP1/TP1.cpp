@@ -86,14 +86,14 @@ void LightsToObjects(Scene* _scene, Pixel* px)
     return;
   }
 
-  IntersectObjects(s, _scene->lights, px, intersection, normal, color, _scene->spheres);
+  IntersectObjects(s, _scene->lights, _scene->spheres, px, intersection, normal, color);
 
   color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
 
   SetPixelCamera(_scene->camera->img, px->x, px->y, color);
 }
 
-void IntersectObjects(Sphere s, Light *l, Pixel* px, glm::vec3& intersect, glm::vec3& normal, glm::vec3& color, Sphere *spheres)
+void IntersectObjects(Sphere s, Light *l, Sphere *spheres, Pixel* px, glm::vec3& intersect, glm::vec3& normal, glm::vec3& color)
 {
   glm::vec3 intersection_normal;
   glm::vec3 intersection_position_sphere_light;
