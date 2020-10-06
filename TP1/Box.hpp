@@ -13,6 +13,12 @@ public:
     BoxSphere(s);
   }
 
+  Box(glm::vec3 _a, glm::vec3 _b)
+  {
+    a = _a;
+    b = _b;
+  }
+
 	void BoxSphere(Sphere* s)
 	{
     float a_x = s->center.x - s->radius;
@@ -30,10 +36,12 @@ public:
 
   void BoxTriangle() {}
 
-  void UnionBox(Box b1, Box b2)
+  Box UnionBox(Box b1, Box b2)
   {
     float a_x, a_y, a_z;
     float b_x, b_y, b_z;
+
+    glm::vec3 _a, _b;
 
     // Calcul of a
     if(b1.a.x > b2.a.x)
@@ -62,6 +70,11 @@ public:
       b_z = b1.b.z;
     else
       b_z = b2.b.z;
+
+    _a = glm::vec3(a_x, a_y, a_z);
+    _b = glm::vec3(b_x, b_y, b_z);
+
+    return Box(_a, _b);
   }
 
 };
