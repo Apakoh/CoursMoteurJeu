@@ -34,6 +34,34 @@ public:
   {
     float a_x, a_y, a_z;
     float b_x, b_y, b_z;
+
+    // Calcul of a
+    if(b1.a.x > b2.a.x)
+      a_x = b1.a.x;
+    else
+      a_x = b2.a.x;
+    if(b1.a.y > b2.a.y)
+      a_y = b1.a.y;
+    else
+      a_y = b2.a.y;
+    if(b1.a.z > b2.a.z)
+      a_z = b1.a.z;
+    else
+      a_z = b2.a.z;
+
+    // Calcul of b
+    if(b1.b.x > b2.b.x)
+      b_x = b1.b.x;
+    else
+      b_x = b2.b.x;
+    if(b1.b.y > b2.b.y)
+      b_y = b1.b.y;
+    else
+      b_y = b2.b.y;
+    if(b1.b.z > b2.b.z)
+      b_z = b1.b.z;
+    else
+      b_z = b2.b.z;
   }
 
 };
