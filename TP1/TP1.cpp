@@ -42,17 +42,17 @@ int main()
 
   Scene main_scene = Scene(&c, lights, spheres);
 
-  RayCastCamera(c, spheres, lights, *c.img);
+  RayCastCamera(&main_scene);
   CreateWindow(c);
 
   return 0;
 }
 
-void RayCastCamera(Camera& c, Sphere *spheres, Light *l, sf::Image& img)
+void RayCastCamera(Scene* _scene)
 {
-  for(int x = 0; x < c.width; x++)
+  for(int x = 0; x < _scene->camera->width; x++)
   {
-    for(int y = 0; y < c.height; y++)
+    for(int y = 0; y < _scene->camera->height; y++)
     {
       Ray r;
       r.origin = glm::vec3(x, y, 0);
@@ -63,17 +63,17 @@ void RayCastCamera(Camera& c, Sphere *spheres, Light *l, sf::Image& img)
       px.x = x;
       px.y = y;
 
-      LightsToObjects(spheres, l, px, *c.img);
+      LightsToObjects(_scene, &px);
     }
   }
 }
 
-void SetPixelCamera(sf::Image& img, int x, int y, glm::vec3 c)
+void SetPixelCamera(sf::Image* img, int x, int y, glm::vec3 c)
 {
-  img.setPixel(x, y, sf::Color(c.x, c.y, c.z));
+  img->setPixel(x, y, sf::Color(c.x, c.y, c.z));
 }
 
-void LightsToObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
+void LightsToObjects(Scene* _scene, Pixel* px)
 {
   glm::vec3 color = glm::vec3(0,0,0);
   glm::vec3 intersection;
@@ -81,19 +81,19 @@ void LightsToObjects(Sphere *spheres, Light *l, Pixel px, sf::Image& img)
 
   Sphere s;
 
-  if(!ShortestIntersection(spheres, px, intersection, normal, s))
+  if(!ShortestIntersection(_scene->spheres, px, intersection, normal, s))
   {
     return;
   }
 
-  IntersectObjects(s, l, px, intersection, normal, color, spheres);
+  IntersectObjects(s, _scene->lights, px, intersection, normal, color, _scene->spheres);
 
   color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(color_clamp, color_clamp, color_clamp));
 
-  SetPixelCamera(img, px.x, px.y, color);
+  SetPixelCamera(_scene->camera->img, px->x, px->y, color);
 }
 
-void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::vec3& normal, glm::vec3& color, Sphere *spheres)
+void IntersectObjects(Sphere s, Light *l, Pixel* px, glm::vec3& intersect, glm::vec3& normal, glm::vec3& color, Sphere *spheres)
 {
   glm::vec3 intersection_normal;
   glm::vec3 intersection_position_sphere_light;
@@ -125,7 +125,7 @@ void IntersectObjects(Sphere s, Light *l, Pixel px, glm::vec3& intersect, glm::v
 }
 
 // https://www.youtube.com/watch?v=aTBlKRzNf74
-void LightOnFireTanana(Sphere s, Light l, Pixel px, glm::vec3& color, glm::vec3& intersection_position, glm::vec3& normal, glm::vec3& lamp_direction)
+void LightOnFireTanana(Sphere s, Light l, Pixel* px, glm::vec3& color, glm::vec3& intersection_position, glm::vec3& normal, glm::vec3& lamp_direction)
 {
     // Calcul of D
     float x = (intersection_position.x - l.position.x);
@@ -187,7 +187,7 @@ void CreateWindow(Camera c)
     }
 }
 
-bool ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection, glm::vec3& normal, Sphere& sph)
+bool ShortestIntersection(Sphere *spheres, Pixel* px, glm::vec3& intersection, glm::vec3& normal, Sphere& sph)
 {
   glm::vec3 intersection_position;
   glm::vec3 intersection_normal;
@@ -200,9 +200,9 @@ bool ShortestIntersection(Sphere *spheres, Pixel px, glm::vec3& intersection, gl
 
   for(int i = 0; i < nb_spheres; i++)
   {
-    if(RaySphereIntersect(px.r.origin, px.r.direction, spheres[i].center, spheres[i].radius, intersection_position, intersection_normal))
+    if(RaySphereIntersect(px->r.origin, px->r.direction, spheres[i].center, spheres[i].radius, intersection_position, intersection_normal))
     {
-      distance_temp = glm::distance(intersection_position, px.r.origin);
+      distance_temp = glm::distance(intersection_position, px->r.origin);
       if(distance_temp < distance && distance > 0);
       {
           intersect = true;
